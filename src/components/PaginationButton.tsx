@@ -10,7 +10,7 @@ const PaginationBtn = styled.button`
   cursor: pointer;
   
   &.current {
-    background-color: cornflowerblue;
+    background-color: #deabff;
   }
 `
 

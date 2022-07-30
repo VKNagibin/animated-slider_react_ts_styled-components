@@ -10,7 +10,7 @@ const AppComponent = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  background: rgba(128, 128, 128, 0.5);
+  background: rgba(204, 164, 253, 0.27);
 `
 
 type ArraySlides = {

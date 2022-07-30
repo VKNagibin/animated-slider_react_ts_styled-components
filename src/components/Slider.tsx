@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import styled, { keyframes } from "styled-components"
 import { nanoid } from "nanoid";
+
+import {Slide, SlidesContainerProps, IProps} from "../sliderTypes";
+import ControlButton from "./ControlButton";
 import PaginationButton from "./PaginationButton";
 
 const ComponentContainer = styled.div`
@@ -14,31 +17,12 @@ const ComponentContainer = styled.div`
 `
 
 const SliderContainer = styled.div`
+  border-radius: 5px;
   width: 600px;
   position: relative;
   display: flex;
   height: 400px;
   overflow: hidden;
-`
-
-const LeftBtn = styled.button`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10;
-  width: 30px;
-  height: 30px;
-  border-radius: 10px;
-  cursor: pointer;
-  position: absolute;
-  top: 50%;
-  left: 10px;
-  transform: translateY(-50%);
-`
-
-const RightBtn = styled(LeftBtn)`
-  left: auto;
-  right: 10px;
 `
 
 const animLeft = keyframes`
@@ -96,7 +80,7 @@ const SlideCount = styled.div`
   top: 10px;
   left: 10px;
   color: rgb(197, 220, 220);
-  background: rgba(54, 54, 54, 0.81);
+  background: rgba(0, 0, 0, 0.8);
   padding: 10px 20px;
   border-radius: 5px;
   z-index: 10;
@@ -116,30 +100,6 @@ const PaginationContainer = styled.div`
   justify-content: center;
   gap: 10px;
 `
-
-interface IProps {
-    stopMouseHover?: boolean,
-    delay?: number,
-    auto?: boolean,
-    navs?: boolean,
-    pags?: boolean,
-    loop?: boolean,
-    slides: {
-        img: string,
-        text: string,
-        id: string,
-        index: number,
-    }[]
-}
-
-type Slide = {
-    img: string,
-    text: string,
-    id: string,
-    index: number,
-}
-
-type SlidesContainerProps = {translation: number};
 
 function Slides(props: IProps) {
     const { auto = false } = props;
@@ -176,6 +136,12 @@ function Slides(props: IProps) {
         }
     });
 
+    const controlBtnHandler = (side: string) => {
+        if (side === "left") {
+            return leftArrowHandler();
+        }
+        return rightArrowHandler();
+    }
 
     const handleLeftMove = (slide: Slide, nextSlide: number) => {
         setNextSlide(slide);
@@ -285,17 +251,14 @@ function Slides(props: IProps) {
 
     return (
         <ComponentContainer>
+            {/*<Switch />*/}
             <SliderContainer onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
                 {
                     props.navs &&
                     (
                         <>
-                            <LeftBtn onClick={leftArrowHandler}>
-                                &#60;
-                            </LeftBtn >
-                            <RightBtn onClick={rightArrowHandler}>
-                                &#62;
-                            </RightBtn>
+                            <ControlButton side="left" controlBtnHandler={controlBtnHandler}/>
+                            <ControlButton side="right" controlBtnHandler={controlBtnHandler}/>
                         </>
                     )
                 }
