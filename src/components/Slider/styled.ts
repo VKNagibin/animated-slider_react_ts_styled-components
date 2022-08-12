@@ -8,7 +8,7 @@ const ComponentContainer = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 20px;
+  gap: 40px;
 `
 
 const SliderContainer = styled.div`
@@ -20,7 +20,7 @@ const SliderContainer = styled.div`
   display: flex;
   justify-content: ${((props: ISliderProps) => props.justifyContent)};
   height: ${((props: ISliderProps) => props.height)}px;
-  overflow: hidden;
+  //overflow: hidden;
 `
 
 const animLeft = keyframes`
@@ -81,9 +81,11 @@ const TextElement = styled.h2`
 `
 
 const PaginationContainer = styled.div`
+  width: 40%;
   display: flex;
+  overflow: hidden;
   justify-content: center;
-  gap: 10px;
+  gap: 20px;
 `
 
 export {

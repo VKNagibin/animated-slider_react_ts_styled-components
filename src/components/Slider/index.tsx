@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { IProps, INextSlideData, AnimationType, FlexJustifyType, Slide } from "./types";
+import React, {useEffect, useState} from 'react';
+import { IProps, INextSlideData, AnimationType, FlexJustifyType, Slide, DirectionType } from "./types";
 import ControlButton from "../ControlButton";
 import SliderImage from "../SliderImage";
 import PaginationButton from "../PaginationButton";
@@ -15,13 +15,23 @@ import {
 } from "./styled"
 
 function Slides(props: IProps) {
-    const [curIndex, setCurIndex] = useState<number>(0);
-    const [gen] = useState<any>(generator());
+    const [ timer, setTimer ] = useState<any>(0);
+    const [ curIndex, setCurIndex ] = useState<number>(0);
+    const [ gen ] = useState<any>(generator());
     const [ animation, setAnimationDirection ] = useState<AnimationType>("");
     const [ status, setStatus ] = useState<string>("end");
     const [ justifyContent, setJustifyContent ] = useState<FlexJustifyType>("");
     const [ imagesArray, setImagesArray ] = useState<string[]>([props.slides[0].img]);
 
+    // useEffect(() => {
+    //     setTimer(
+    //         setTimeout(() => {
+    //             activateSlider("Right", curIndex + 1);
+    //         }, 300)
+    //     );
+    //
+    //     return clearTimeout(timer);
+    // }, [curIndex]);
 
     const prepareSlides = ({ direction, nextIndex }: INextSlideData) => {
         if (direction === "Right") {
@@ -34,17 +44,23 @@ function Slides(props: IProps) {
         return
     }
 
-    const validateIndex = (index: number) => {
-        if (index < 0) return props.slides.length - 1;
-        if (index > props.slides.length - 1) return 0
+    const loopHandler = (index: number) => {
+        if (!props.loop) {
+            return NaN;
+        }
 
         return index;
     }
 
-    const getNextIndex = (source: string, index?: number) => {
-        if (source === "leftControl") return validateIndex(curIndex - 1);
-        if (source === "rightControl") return validateIndex(curIndex + 1);
-        if (source === "pagination" && index !== undefined) return validateIndex(index);
+    const validateIndex = (index: number) => {
+        if (index < 0) return loopHandler(props.slides.length - 1);
+        if (index > props.slides.length - 1) return loopHandler(0);
+
+        return index;
+    }
+
+    const getNextIndex = (index: number) => {
+        return validateIndex(index);
     }
 
     function* generator() {
@@ -56,13 +72,15 @@ function Slides(props: IProps) {
         }
     }
 
-    const activateSlider = (direction: "Left" | "Right" | null, source: string, index?: number) => {
+    const activateSlider = (direction: DirectionType, index: number) => {
         if (status !== "end") return
-        if (!direction) return
+        if (direction === "don't move") return
+
+        const nextIndex = getNextIndex(index);
+
+        if ( isNaN(nextIndex) ) return
 
         setStatus("pending");
-
-        const nextIndex = getNextIndex(source, index);
 
         gen.next();
         gen.next({
@@ -92,7 +110,7 @@ function Slides(props: IProps) {
         setAnimationDirection("");
     }
 
-    const editedArray = (direction: "Left" | "Right", array: string[]) => {
+    const editedArray = (direction: DirectionType, array: string[]) => {
         let newArray = array.slice();
         if (direction === "Left") {
             newArray.pop();
@@ -112,8 +130,8 @@ function Slides(props: IProps) {
                     props.navs &&
                     (
                         <>
-                            <ControlButton source={"leftControl"} direction="Left" changeSlide={activateSlider}/>
-                            <ControlButton source={"rightControl"} direction="Right" changeSlide={activateSlider}/>
+                            <ControlButton index={curIndex - 1} direction="Left" changeSlide={activateSlider}/>
+                            <ControlButton index={curIndex + 1} direction="Right" changeSlide={activateSlider}/>
                         </>
                     )
                 }
@@ -122,7 +140,7 @@ function Slides(props: IProps) {
                 </SlideCount>
                 <SlidesContainer onAnimationEnd={animationIsFinished} className={animation}>
                     {
-                        imagesArray.map((item, index) => (<SliderImage height={props.height} width={props.width} src={item} key={nanoid()}/>))
+                        imagesArray.map(item => (<SliderImage height={props.height} width={props.width} src={item} key={nanoid()}/>))
                     }
                 </SlidesContainer>
                 <TextElement>
@@ -136,7 +154,7 @@ function Slides(props: IProps) {
                     <PaginationContainer>
                         {
                             props.slides.map((item: Slide, index: number): JSX.Element => (
-                                <PaginationButton curSlide={curIndex} index={index} source={"pagination"} changeSlide={activateSlider} key={nanoid()}/>))
+                                <PaginationButton curSlide={curIndex} index={index} changeSlide={activateSlider} key={nanoid()}/>))
                         }
                     </PaginationContainer>
                 )

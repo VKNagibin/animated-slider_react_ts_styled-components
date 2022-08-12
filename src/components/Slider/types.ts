@@ -17,6 +17,8 @@ export interface IProps {
 
 export type AnimationType = "Left" | "Right" | "";
 
+export type DirectionType = "Left" | "Right" | "don't move";
+
 export type FlexJustifyType = "flex-start" | "flex-end" | "center" | "";
 
 export interface ISliderProps {
