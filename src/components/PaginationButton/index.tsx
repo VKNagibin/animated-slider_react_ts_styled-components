@@ -3,9 +3,10 @@ import { PaginationBtn } from "./styled";
 import { DirectionType } from "../Slider/types";
 
 interface IProps {
+    source: string;
     index: number,
     curSlide: number,
-    changeSlide: (direction: DirectionType, index: number) => void;
+    changeSlide: (direction: DirectionType, index: number, source: string) => void;
 }
 
 export default function PaginationButton(props: IProps): JSX.Element {
@@ -15,7 +16,7 @@ export default function PaginationButton(props: IProps): JSX.Element {
         if (props.index > props.curSlide) direction = "Right";
         if (props.index < props.curSlide) direction = "Left";
 
-        props.changeSlide(direction, props.index);
+        props.changeSlide(direction, props.index, props.source);
     }
 
     return (

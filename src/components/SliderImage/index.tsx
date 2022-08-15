@@ -8,6 +8,6 @@ interface IProps {
 
 export default function SliderImage({ src, width, height }: IProps) {
     return (
-        <Image src={src} style={{width: `${width}px`, height: `${height}px` }}/>
+        <Image src={src} style={{minWidth: `${width}px`, minHeight: `${height}px` }}/>
     )
 }

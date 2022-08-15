@@ -5,14 +5,15 @@ import { RightBtn, LeftBtn } from "./styled";
 type SideType = "Left" | "Right";
 
 interface IProps {
-    changeSlide: (side: SideType, index: number) => void;
+    changeSlide: (side: SideType, index: number, source: string) => void;
     direction: SideType;
     index: number;
+    source: string;
 }
 
 export default function ControlButton(props: IProps):JSX.Element {
     const handleClick = (): void => {
-        props.changeSlide(props.direction, props.index);
+        props.changeSlide(props.direction, props.index, props.source);
     }
 
     return (

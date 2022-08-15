@@ -1,9 +1,10 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import { IProps, INextSlideData, AnimationType, FlexJustifyType, Slide, DirectionType } from "./types";
 import ControlButton from "../ControlButton";
 import SliderImage from "../SliderImage";
 import PaginationButton from "../PaginationButton";
 import { nanoid } from "nanoid";
+import { defaults } from "../../defaultConfigs/defaultDimensions";
 
 import {
     ComponentContainer,
@@ -14,8 +15,10 @@ import {
     PaginationContainer,
 } from "./styled"
 
+let timerId: any;
+
 function Slides(props: IProps) {
-    const [ timer, setTimer ] = useState<any>(0);
+    const [ rejectAutoChange, setAutoChange ] = useState<boolean>(false);
     const [ curIndex, setCurIndex ] = useState<number>(0);
     const [ gen ] = useState<any>(generator());
     const [ animation, setAnimationDirection ] = useState<AnimationType>("");
@@ -23,15 +26,53 @@ function Slides(props: IProps) {
     const [ justifyContent, setJustifyContent ] = useState<FlexJustifyType>("");
     const [ imagesArray, setImagesArray ] = useState<string[]>([props.slides[0].img]);
 
-    // useEffect(() => {
-    //     setTimer(
-    //         setTimeout(() => {
-    //             activateSlider("Right", curIndex + 1);
-    //         }, 300)
-    //     );
-    //
-    //     return clearTimeout(timer);
-    // }, [curIndex]);
+    const height = props.height || defaults.height;
+    const width = props.width || defaults.width;
+
+    useEffect(() => {
+        if (!rejectAutoChange && props.auto) {
+            timerId = setTimeout(() => {
+                activateSlider("Right", curIndex + 1);
+            }, setDelay());
+        }
+
+        return function() {
+            clearTimeout(timerId);
+        }
+    }, [curIndex]);
+
+    const activateSlider = (direction: DirectionType, index: number, source?: string) => {
+        if (status !== "end") return
+        if (direction === "don't move") return
+
+        preventAuto(source ? source : null);
+
+        const nextIndex = validateIndex(index);
+
+        if ( isNaN(nextIndex) ) return
+
+        setStatus("pending");
+
+        gen.next();
+        gen.next({
+            direction,
+            nextIndex
+        });
+        gen.next();
+    };
+
+    function* generator() {
+        while(true) {
+            const data: INextSlideData = yield;
+            yield prepareSlides(data);
+            yield startAnimation(data);
+            yield clearContainer(data);
+        }
+    }
+
+    const setDelay = () => {
+        return props.delay ? props.delay * 1000 : 5000;
+    }
 
     const prepareSlides = ({ direction, nextIndex }: INextSlideData) => {
         if (direction === "Right") {
@@ -48,7 +89,6 @@ function Slides(props: IProps) {
         if (!props.loop) {
             return NaN;
         }
-
         return index;
     }
 
@@ -59,35 +99,11 @@ function Slides(props: IProps) {
         return index;
     }
 
-    const getNextIndex = (index: number) => {
-        return validateIndex(index);
-    }
+    const preventAuto = (source: string | null) => {
+        if (!source) return
 
-    function* generator() {
-        while(true) {
-            const data: INextSlideData = yield;
-            yield prepareSlides(data);
-            yield startAnimation(data);
-            yield clearContainer(data);
-        }
-    }
-
-    const activateSlider = (direction: DirectionType, index: number) => {
-        if (status !== "end") return
-        if (direction === "don't move") return
-
-        const nextIndex = getNextIndex(index);
-
-        if ( isNaN(nextIndex) ) return
-
-        setStatus("pending");
-
-        gen.next();
-        gen.next({
-            direction,
-            nextIndex
-        });
-        gen.next();
+        setAutoChange(true);
+        clearTimeout(timerId);
     }
 
     const startAnimation = ({ direction }: INextSlideData ) => {
@@ -99,7 +115,7 @@ function Slides(props: IProps) {
         setStatus("end");
     }
 
-    const clearContainer = ({direction, nextIndex}: INextSlideData) => {
+    const clearContainer = ({ direction, nextIndex }: INextSlideData) => {
         setImagesArray((prev) => {
             return editedArray(direction, prev);
         });
@@ -121,26 +137,55 @@ function Slides(props: IProps) {
         return newArray
     }
 
+    const stopOnMouseOver = () => {
+        if (!props.stopMouseHover) return
+        if (!props.auto) return
+
+        setAutoChange(true);
+        clearTimeout(timerId);
+    }
+
+    const startOnMouseLeave = () => {
+        if (!props.stopMouseHover) return
+        if (!props.auto) return
+
+        setAutoChange(false);
+        timerId = setTimeout(() => {
+            activateSlider("Right", curIndex + 1);
+        }, setDelay());
+    }
+
     return (
-        <ComponentContainer>
-            <SliderContainer width={props.width}
-                             height={props.height}
+        <ComponentContainer  onMouseEnter={stopOnMouseOver}
+                             onMouseLeave={startOnMouseLeave}>
+
+            <SliderContainer width={ width }
+                             height={ height }
                              justifyContent={justifyContent}>
                 {
                     props.navs &&
-                    (
-                        <>
-                            <ControlButton index={curIndex - 1} direction="Left" changeSlide={activateSlider}/>
-                            <ControlButton index={curIndex + 1} direction="Right" changeSlide={activateSlider}/>
-                        </>
-                    )
+                    (<>
+                        <ControlButton index={curIndex - 1}
+                                       direction="Left"
+                                       source="userClick"
+                                       changeSlide={activateSlider}/>
+                        <ControlButton index={curIndex + 1}
+                                       direction="Right"
+                                       source="userClick"
+                                       changeSlide={activateSlider}/>
+                    </>)
                 }
                 <SlideCount>
                     { `${curIndex + 1} / ${props.slides.length}` }
                 </SlideCount>
-                <SlidesContainer onAnimationEnd={animationIsFinished} className={animation}>
+                <SlidesContainer onAnimationEnd={animationIsFinished}
+                                 className={animation}>
                     {
-                        imagesArray.map(item => (<SliderImage height={props.height} width={props.width} src={item} key={nanoid()}/>))
+                        imagesArray.map(item => (
+                            <SliderImage height={ height }
+                                         width={ width }
+                                         src={item}
+                                         key={nanoid()}/>))
                     }
                 </SlidesContainer>
                 <TextElement>
@@ -150,14 +195,16 @@ function Slides(props: IProps) {
             </SliderContainer>
             {
                 props.pags &&
-                (
-                    <PaginationContainer>
-                        {
-                            props.slides.map((item: Slide, index: number): JSX.Element => (
-                                <PaginationButton curSlide={curIndex} index={index} changeSlide={activateSlider} key={nanoid()}/>))
-                        }
-                    </PaginationContainer>
-                )
+                (<PaginationContainer>
+                    {
+                        props.slides.map((item: Slide, index: number): JSX.Element => (
+                            <PaginationButton curSlide={curIndex}
+                                              index={index}
+                                              source="userClick"
+                                              changeSlide={activateSlider}
+                                              key={nanoid()}/>))
+                    }
+                </PaginationContainer>)
             }
         </ComponentContainer>
     );

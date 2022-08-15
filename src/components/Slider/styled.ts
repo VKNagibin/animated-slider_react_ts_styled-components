@@ -1,5 +1,5 @@
-import styled, {keyframes} from "styled-components";
-import {ISliderProps} from "./types";
+import styled, { keyframes } from "styled-components";
+import { ISliderProps } from "./types";
 
 const ComponentContainer = styled.div`
   width: 100%;
@@ -12,6 +12,7 @@ const ComponentContainer = styled.div`
 `
 
 const SliderContainer = styled.div`
+  max-width: 100%;
   border-radius: 10px;
   outline: 4px solid rgba(21, 21, 21, 0.83);
   box-sizing: content-box;
@@ -20,7 +21,7 @@ const SliderContainer = styled.div`
   display: flex;
   justify-content: ${((props: ISliderProps) => props.justifyContent)};
   height: ${((props: ISliderProps) => props.height)}px;
-  //overflow: hidden;
+  overflow: hidden;
 `
 
 const animLeft = keyframes`
@@ -42,6 +43,7 @@ const animRight = keyframes`
 `
 
 const SlidesContainer = styled.div`
+  width: 100%;
   height: 100%;
   display: flex;
   animation-duration: .5s;
@@ -82,8 +84,9 @@ const TextElement = styled.h2`
 
 const PaginationContainer = styled.div`
   width: 40%;
+  overflow: auto;
   display: flex;
-  overflow: hidden;
+  flex-wrap: wrap;
   justify-content: center;
   gap: 20px;
 `

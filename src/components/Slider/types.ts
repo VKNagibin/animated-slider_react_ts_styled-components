@@ -1,6 +1,6 @@
 export interface IProps {
-    width: number,
-    height: number,
+    width?: number,
+    height?: number,
     stopMouseHover?: boolean,
     delay?: number,
     auto?: boolean,

@@ -10,18 +10,17 @@ const LeftBtn = styled.button`
   top: 50%;
   left: 5%;
   border: none;
-  background: black;
+  background: transparent;
   transform: translateY(-50%);
 
   .left-arrow, .right-arrow {
     will-change: transform;
     transition: .2s;
-    background: #000;
+    background: rgba(0, 0, 0, 0.92) ;
     transform: scale(5);
-    color: #deabff;
-    border-radius: 50%;
+    color: rgba(255, 255, 255, 0.98);
+    border-radius: 2px;
     box-sizing: content-box;
-    border: 1px solid #1c191e;
 
     &:hover {
       transform: scale(5.2);
