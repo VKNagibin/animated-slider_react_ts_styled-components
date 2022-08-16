@@ -5,5 +5,5 @@ export const Image = styled.img`
   width: 50%;
   height: 100%;
   object-position: center;
-  object-fit: cover;
+  object-fit: fill;
 `
