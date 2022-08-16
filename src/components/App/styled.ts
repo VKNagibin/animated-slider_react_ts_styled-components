@@ -8,4 +8,8 @@ export const AppComponent = styled.div`
   justify-content: center;
   align-items: center;
   background: rgba(204, 164, 253, 0.27);
+  
+  @media ( max-width: 720px) {
+    padding: 5px;
+  }
 `

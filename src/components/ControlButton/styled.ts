@@ -26,6 +26,12 @@ const LeftBtn = styled.button`
       transform: scale(5.2);
 
     }
+    
+    @media (max-width: 720px) {
+      transform: scale(3);
+      &:hover {
+        transform: scale(3.2);
+    }
   }
 `
 

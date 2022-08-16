@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import { IProps, INextSlideData, AnimationType, FlexJustifyType, Slide, DirectionType } from "./types";
 import ControlButton from "../ControlButton";
 import SliderImage from "../SliderImage";
 import PaginationButton from "../PaginationButton";
 import { nanoid } from "nanoid";
-import { defaults } from "../../defaultConfigs/defaultDimensions";
 
 import {
     ComponentContainer,
@@ -26,9 +25,6 @@ function Slides(props: IProps) {
     const [ justifyContent, setJustifyContent ] = useState<FlexJustifyType>("");
     const [ imagesArray, setImagesArray ] = useState<string[]>([props.slides[0].img]);
 
-    const height = props.height || defaults.height;
-    const width = props.width || defaults.width;
-
     useEffect(() => {
         if (!rejectAutoChange && props.auto) {
             timerId = setTimeout(() => {
@@ -40,6 +36,15 @@ function Slides(props: IProps) {
             clearTimeout(timerId);
         }
     }, [curIndex]);
+
+    function* generator() {
+        while(true) {
+            const data: INextSlideData = yield;
+            yield prepareSlides(data);
+            yield startAnimation(data);
+            yield clearContainer(data);
+        }
+    }
 
     const activateSlider = (direction: DirectionType, index: number, source?: string) => {
         if (status !== "end") return
@@ -60,15 +65,6 @@ function Slides(props: IProps) {
         });
         gen.next();
     };
-
-    function* generator() {
-        while(true) {
-            const data: INextSlideData = yield;
-            yield prepareSlides(data);
-            yield startAnimation(data);
-            yield clearContainer(data);
-        }
-    }
 
     const setDelay = () => {
         return props.delay ? props.delay * 1000 : 5000;
@@ -156,12 +152,10 @@ function Slides(props: IProps) {
     }
 
     return (
-        <ComponentContainer  onMouseEnter={stopOnMouseOver}
-                             onMouseLeave={startOnMouseLeave}>
+        <ComponentContainer onMouseEnter={stopOnMouseOver}
+                            onMouseLeave={startOnMouseLeave}>
 
-            <SliderContainer width={ width }
-                             height={ height }
-                             justifyContent={justifyContent}>
+            <SliderContainer justifyContent={justifyContent}>
                 {
                     props.navs &&
                     (<>
@@ -182,10 +176,9 @@ function Slides(props: IProps) {
                                  className={animation}>
                     {
                         imagesArray.map(item => (
-                            <SliderImage height={ height }
-                                         width={ width }
-                                         src={item}
-                                         key={nanoid()}/>))
+                            <SliderImage src={item}
+                                         key={nanoid()}
+                            />))
                     }
                 </SlidesContainer>
                 <TextElement>
@@ -202,7 +195,7 @@ function Slides(props: IProps) {
                                               index={index}
                                               source="userClick"
                                               changeSlide={activateSlider}
-                                              key={nanoid()}/>))
+                                              key={nanoid()} />))
                     }
                 </PaginationContainer>)
             }

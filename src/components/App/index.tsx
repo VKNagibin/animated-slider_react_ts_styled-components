@@ -30,13 +30,11 @@ function App() {
   return (
       <AppComponent>
           <Slider slides={arraySlides}
-                  width={1000}
-                  height={600}
-                  loop={false}
+                  loop={true}
                   pags={true}
                   navs={true}
                   auto={false}
-                  delay={1}
+                  // delay={1}
                   stopMouseHover={false}
           />
       </AppComponent>

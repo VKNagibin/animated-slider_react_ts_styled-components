@@ -3,26 +3,26 @@ import { ISliderProps } from "./types";
 
 const ComponentContainer = styled.div`
   width: 100%;
-  height: 100vh;
+  height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   gap: 40px;
 `
 
 const SliderContainer = styled.div`
-  max-width: 100%;
-  border-radius: 10px;
+  flex-basis: 90%;
+  width: 100%;
+  border-radius: 5px;
   outline: 4px solid rgba(21, 21, 21, 0.83);
   box-sizing: content-box;
-  width: ${((props: ISliderProps) => props.width)}px;
   position: relative;
+  flex-direction: column;
   display: flex;
-  justify-content: ${((props: ISliderProps) => props.justifyContent)};
-  height: ${((props: ISliderProps) => props.height)}px;
+  align-items: ${((props: ISliderProps) => props.justifyContent)};
   overflow: hidden;
 `
+
 
 const animLeft = keyframes`
   from {
@@ -43,13 +43,14 @@ const animRight = keyframes`
 `
 
 const SlidesContainer = styled.div`
-  width: 100%;
+  width: 200%;
   height: 100%;
   display: flex;
-  animation-duration: .5s;
+  animation-duration: 1s;
   animation-iteration-count: 1;
   animation-timing-function: linear;
   animation-fill-mode: forwards;
+ 
   
   &.Left {
     animation-name: ${animLeft};
@@ -83,10 +84,10 @@ const TextElement = styled.h2`
 `
 
 const PaginationContainer = styled.div`
-  width: 40%;
+  width: 90%;
+  flex-basis: 10%;
   overflow: auto;
   display: flex;
-  flex-wrap: wrap;
   justify-content: center;
   gap: 20px;
 `

@@ -22,8 +22,8 @@ export type DirectionType = "Left" | "Right" | "don't move";
 export type FlexJustifyType = "flex-start" | "flex-end" | "center" | "";
 
 export interface ISliderProps {
-    width: number,
-    height: number,
+    // width: string,
+    // height: string,
     justifyContent: string,
 }
 
