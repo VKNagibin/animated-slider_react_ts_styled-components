@@ -106,7 +106,7 @@ function Slides(props: IProps) {
         setAnimationDirection(direction);
     }
 
-    const animationIsFinished = () => {
+    const animationEnd = () => {
         gen.next();
         setStatus("end");
     }
@@ -172,7 +172,7 @@ function Slides(props: IProps) {
                 <SlideCount>
                     { `${curIndex + 1} / ${props.slides.length}` }
                 </SlideCount>
-                <SlidesContainer onAnimationEnd={animationIsFinished}
+                <SlidesContainer onAnimationEnd={animationEnd}
                                  className={animation}>
                     {
                         imagesArray.map(item => (
