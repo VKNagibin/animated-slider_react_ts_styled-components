@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import { IProps, INextSlideData, AnimationType, FlexJustifyType, Slide, DirectionType } from "./types";
 import ControlButton from "../ControlButton";
 import SliderImage from "../SliderImage";
@@ -18,8 +18,8 @@ let timerId: any;
 
 function Slides(props: IProps) {
     const [ rejectAutoChange, setAutoChange ] = useState<boolean>(false);
-    const [ curIndex, setCurIndex ] = useState<number>(0);
-    const [ gen ] = useState<any>(generator());
+    const [ currentIndex, setCurrentIndex ] = useState<number>(0);
+    const [ generatorInstance ] = useState<any>(generator());
     const [ animation, setAnimationDirection ] = useState<AnimationType>("");
     const [ status, setStatus ] = useState<string>("end");
     const [ justifyContent, setJustifyContent ] = useState<FlexJustifyType>("");
@@ -28,14 +28,14 @@ function Slides(props: IProps) {
     useEffect(() => {
         if (!rejectAutoChange && props.auto) {
             timerId = setTimeout(() => {
-                activateSlider("Right", curIndex + 1);
+                activateSlider("Right", currentIndex + 1);
             }, setDelay());
         }
 
         return function() {
             clearTimeout(timerId);
         }
-    }, [curIndex]);
+    }, [currentIndex]);
 
     function* generator() {
         while(true) {
@@ -58,12 +58,12 @@ function Slides(props: IProps) {
 
         setStatus("pending");
 
-        gen.next();
-        gen.next({
+        generatorInstance.next();
+        generatorInstance.next({
             direction,
             nextIndex
         });
-        gen.next();
+        generatorInstance.next();
     };
 
     const setDelay = () => {
@@ -107,7 +107,7 @@ function Slides(props: IProps) {
     }
 
     const animationEnd = () => {
-        gen.next();
+        generatorInstance.next();
         setStatus("end");
     }
 
@@ -116,7 +116,7 @@ function Slides(props: IProps) {
             return editedArray(direction, prev);
         });
 
-        setCurIndex(validateIndex(nextIndex));
+        setCurrentIndex(validateIndex(nextIndex));
 
         setJustifyContent("");
         setAnimationDirection("");
@@ -147,7 +147,7 @@ function Slides(props: IProps) {
 
         setAutoChange(false);
         timerId = setTimeout(() => {
-            activateSlider("Right", curIndex + 1);
+            activateSlider("Right", currentIndex + 1);
         }, setDelay());
     }
 
@@ -159,18 +159,18 @@ function Slides(props: IProps) {
                 {
                     props.navs &&
                     (<>
-                        <ControlButton index={curIndex - 1}
+                        <ControlButton index={currentIndex - 1}
                                        direction="Left"
                                        source="userClick"
                                        changeSlide={activateSlider}/>
-                        <ControlButton index={curIndex + 1}
+                        <ControlButton index={currentIndex + 1}
                                        direction="Right"
                                        source="userClick"
                                        changeSlide={activateSlider}/>
                     </>)
                 }
                 <SlideCount>
-                    { `${curIndex + 1} / ${props.slides.length}` }
+                    { `${currentIndex + 1} / ${props.slides.length}` }
                 </SlideCount>
                 <SlidesContainer onAnimationEnd={animationEnd}
                                  className={animation}>
@@ -182,7 +182,7 @@ function Slides(props: IProps) {
                     }
                 </SlidesContainer>
                 <TextElement>
-                    {props.slides[curIndex].text}
+                    {props.slides[currentIndex].text}
                 </TextElement>
 
             </SliderContainer>
@@ -191,7 +191,7 @@ function Slides(props: IProps) {
                 (<PaginationContainer>
                     {
                         props.slides.map((item: Slide, index: number): JSX.Element => (
-                            <PaginationButton curSlide={curIndex}
+                            <PaginationButton curSlide={currentIndex}
                                               index={index}
                                               source="userClick"
                                               changeSlide={activateSlider}
