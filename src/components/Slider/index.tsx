@@ -19,11 +19,18 @@ let timerId: any;
 function Slides(props: IProps) {
     const [ rejectAutoChange, setAutoChange ] = useState<boolean>(false);
     const [ currentIndex, setCurrentIndex ] = useState<number>(0);
-    const [ generatorInstance ] = useState<any>(generator());
     const [ animation, setAnimationDirection ] = useState<AnimationType>("");
     const [ status, setStatus ] = useState<string>("end");
     const [ justifyContent, setJustifyContent ] = useState<FlexJustifyType>("");
     const [ imagesArray, setImagesArray ] = useState<string[]>([props.slides[0].img]);
+
+    const getGeneratorInstance = () => {
+        const newGenerator = generator();
+        newGenerator.next();
+        return newGenerator;
+    }
+
+    const [ generatorInstance, setGeneratorInstance ] = useState<any>(getGeneratorInstance());
 
     useEffect(() => {
         if (!rejectAutoChange && props.auto) {
@@ -37,10 +44,11 @@ function Slides(props: IProps) {
         }
     }, [currentIndex]);
 
+
     function* generator() {
         while(true) {
             const data: INextSlideData = yield;
-            yield prepareSlides(data);
+            prepareSlides(data);
             yield startAnimation(data);
             yield clearContainer(data);
         }
@@ -58,12 +66,10 @@ function Slides(props: IProps) {
 
         setStatus("pending");
 
-        generatorInstance.next();
         generatorInstance.next({
             direction,
             nextIndex
         });
-        generatorInstance.next();
     };
 
     const setDelay = () => {
@@ -109,6 +115,7 @@ function Slides(props: IProps) {
     const animationEnd = () => {
         generatorInstance.next();
         setStatus("end");
+        setGeneratorInstance(getGeneratorInstance());
     }
 
     const clearContainer = ({ direction, nextIndex }: INextSlideData) => {

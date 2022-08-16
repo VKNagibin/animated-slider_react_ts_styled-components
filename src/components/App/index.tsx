@@ -33,8 +33,8 @@ function App() {
                   loop={true}
                   pags={true}
                   navs={true}
-                  auto={false}
-                  // delay={1}
+                  auto={true}
+                  delay={.1}
                   stopMouseHover={false}
           />
       </AppComponent>
