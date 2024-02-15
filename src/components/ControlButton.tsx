@@ -33,25 +33,19 @@ const RightBtn = styled(LeftBtn)`
     right: 20px;
 `
 
-interface IProps {
-    controlBtnHandler: (side: string) => void;
-    side: "left" | "right";
+interface ButtonInterface {
+    onClick: () => void
+    side: 'left' | 'right'
 }
 
-export default function ControlButton(props: IProps):JSX.Element {
-    const handleClick = (): void => {
-        props.controlBtnHandler(props.side);
-    }
-
-    return (
-        props.side === "left" ?
-            <LeftBtn>
-                <CaretLeftSquareFill className="left-arrow" onClick={handleClick} />
-            </LeftBtn>
-            :
-            <RightBtn>
-                <CaretRightSquareFill className="right-arrow" onClick={handleClick} />
-            </RightBtn>
+export default function ControlButton({ side, onClick }: ButtonInterface) {
+    return side === 'left' ? (
+        <LeftBtn>
+            <CaretLeftSquareFill className="left-arrow" onClick={onClick} />
+        </LeftBtn>
+    ) : (
+        <RightBtn>
+            <CaretRightSquareFill className="right-arrow" onClick={onClick} />
+        </RightBtn>
     )
-
 }
