@@ -121,7 +121,6 @@ export default function useSliderLogic({ slides, auto = false, delay, loop, stop
 
     useEffect(() => {
         if (isAuto) {
-            console.log('here!@')
             setTimerId(
                 setTimeout(() => {
                     rightArrowHandler()
