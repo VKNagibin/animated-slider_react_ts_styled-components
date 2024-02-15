@@ -14,10 +14,12 @@ export interface IProps {
 }
 
 export type Slide = {
-    img: string,
-    text: string,
-    id: string,
-    index: number,
+    img: string
+    text: string
+    id: string
+    index: number
 }
 
-export type SlidesContainerProps = {translation: number};
+export type SlidesContainerProps = {
+    translation: number
+}
