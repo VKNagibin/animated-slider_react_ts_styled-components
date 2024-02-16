@@ -1,5 +1,4 @@
 import styled, { keyframes } from 'styled-components'
-import { SlidesContainerProps } from '../../sliderTypes'
 
 export const StyledComponentContainer = styled.div`
     width: 100%;
@@ -38,23 +37,21 @@ const rightMoveKeyframes = keyframes`
   }
 `
 
-export const StyledSlidesContainer = styled.div<SlidesContainerProps>`
+export const StyledSlidesContainer = styled.div`
     width: 1800px;
     height: 400px;
     justify-content: center;
     display: flex;
-    transform: translateX(${({ translation }) => translation}px);
-
     animation-duration: 0.5s;
     animation-iteration-count: 1;
     animation-timing-function: linear;
     animation-fill-mode: forwards;
 
-    &.animLeft {
+    &.leftDirection {
         animation-name: ${leftMoveKeyframes};
     }
 
-    &.animRight {
+    &.rightDirection {
         animation-name: ${rightMoveKeyframes};
     }
 `
