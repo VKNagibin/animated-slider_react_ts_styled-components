@@ -14,14 +14,17 @@ export default function useSlides(slides: InitialSlideType[]) {
         [slides]
     )
 
-    const [slide, setSlide] = useState<SlideType>(preparedSlides[0])
-    const [nextSlide, setNextSlide] = useState<SlideType>(preparedSlides[1])
+    const [leftSlide, setLeftSlide] = useState<SlideType>()
+    const [mainSlide, setMainSlide] = useState<SlideType>(preparedSlides[0])
+    const [rightSlide, setRightSlide] = useState<SlideType>()
 
     return {
         preparedSlides,
-        slide,
-        setSlide,
-        nextSlide,
-        setNextSlide,
+        leftSlide,
+        mainSlide,
+        rightSlide,
+        setLeftSlide,
+        setMainSlide,
+        setRightSlide,
     }
 }
