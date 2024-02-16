@@ -1,8 +1,9 @@
-import { SliderInterface } from '../../sliderTypes'
-import ControlButton from '../ControlButton'
-import PaginationButton from '../PaginationButton'
 import { nanoid } from 'nanoid'
 import React, { memo } from 'react'
+
+import { SliderInterface } from '@/types'
+import ControlButton from '../ControlButton'
+import PaginationButton from '../PaginationButton'
 import {
     StyledComponentContainer,
     StyledDescription,
@@ -16,26 +17,25 @@ import useSliderLogic from './hooks/useSliderLogic'
 
 function Slider({
     slides = [],
-    delay,
-    auto = false,
+    auto,
     withNavigation,
     withPagination,
-    loop,
-    stopOnMouseOver,
+    infinitely = false,
+    stopOnMouseOver = true,
 }: SliderInterface) {
     const {
-        slide,
-        nextSlide,
+        leftSlide,
+        mainSlide,
+        rightSlide,
+        animationRef,
         index,
-        left,
-        right,
-        translation,
+        animationName,
         handleMouseLeave,
-        handleMouseEnter,
         handlePaginationBtn,
+        handleMouseEnter,
         leftArrowHandler,
         rightArrowHandler,
-    } = useSliderLogic({ slides, auto, delay, loop, stopOnMouseOver })
+    } = useSliderLogic({ slides, auto, infinitely, stopOnMouseOver })
 
     return (
         <StyledComponentContainer>
@@ -46,14 +46,11 @@ function Slider({
                         <ControlButton side="right" onClick={rightArrowHandler} />
                     </>
                 )}
-
                 <StyledSlidesCount>{`${index + 1} / ${slides.length}`}</StyledSlidesCount>
-                <StyledSlidesContainer
-                    className={left ? 'animLeft' : right ? 'animRight' : ''}
-                    translation={translation}
-                >
-                    <StyledImage src={slide.img} />
-                    <StyledImage src={nextSlide.img} />
+                <StyledSlidesContainer ref={animationRef} className={animationName}>
+                    {leftSlide && <StyledImage src={leftSlide.img} title="left" />}
+                    <StyledImage src={mainSlide.img} title="main" />
+                    {rightSlide && <StyledImage src={rightSlide.img} title="right" />}
                 </StyledSlidesContainer>
                 <StyledDescription>{slides[index].text}</StyledDescription>
             </StyledSliderContainer>
