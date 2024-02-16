@@ -1,8 +1,8 @@
 import styled from 'styled-components'
 
-import { slides as mockSlides } from './mock'
+import Slider from '@components/Slider'
 
-import Slider from '../Slider'
+import { slides as mockSlides } from './mock'
 
 const AppComponent = styled.div`
     padding: 40px;
@@ -19,12 +19,11 @@ function App() {
         <AppComponent>
             <Slider
                 slides={mockSlides}
-                loop={true}
                 withPagination
                 withNavigation
-                auto
-                delay={2000}
-                stopOnMouseOver={false}
+                infinitely
+                // auto={{ active: true, direction: DirectionType.RIGHT }}
+                stopOnMouseOver
             />
         </AppComponent>
     )
