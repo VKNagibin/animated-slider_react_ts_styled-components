@@ -3,13 +3,23 @@ import React from 'react'
 export interface SliderInterface {
     slides: InitialSlideType[]
     stopOnMouseOver?: boolean
-    delay?: number
-    auto?: boolean
+    auto?: ModeAutoInterface
     withNavigation?: boolean
     navigationComponent?: React.ReactNode
     withPagination?: boolean
     paginationComponent?: React.ReactNode
-    loop?: boolean
+    infinitely?: boolean
+}
+
+export interface ModeAutoInterface {
+    active: boolean
+    delay?: number
+    direction?: DirectionType
+}
+
+export enum DirectionType {
+    LEFT = 'left',
+    RIGHT = 'right',
 }
 
 export type SlideType = {
