@@ -1,4 +1,3 @@
-import { InitialSlideType } from './components/App/types'
 import React from 'react'
 
 export interface SliderInterface {
@@ -13,13 +12,14 @@ export interface SliderInterface {
     loop?: boolean
 }
 
-export type Slide = {
+export type SlideType = {
     img: string
     text: string
     id: string
     index: number
 }
 
-export type SlidesContainerProps = {
-    translation: number
+export type InitialSlideType = {
+    img: string
+    text: string
 }
