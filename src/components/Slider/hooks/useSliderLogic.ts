@@ -1,68 +1,54 @@
 import { useEffect, useRef, useState } from 'react'
 
-import { SlideType, InitialSlideType } from '@/types'
+import { InitialSlideType, ModeAutoInterface, DirectionType } from '@/types'
 
 import useSlides from './useSlides'
 
 interface HookInterface {
     slides: InitialSlideType[]
     stopOnMouseOver: boolean
-    delay: number
-    auto: boolean
-    loop: boolean
+    auto?: ModeAutoInterface
+    infinitely: boolean
 }
+
+const defaultDelay = 1000
 
 const leftDirectionAnimationName = 'leftDirection'
 const rightDirectionAnimationName = 'rightDirection'
 const noAnimationString = ''
 
-export default function useSliderLogic({ slides, auto, delay, loop, stopOnMouseOver }: HookInterface) {
+export default function useSliderLogic({ slides, auto, infinitely, stopOnMouseOver }: HookInterface) {
     const [index, setIndex] = useState<number>(0)
     const [animationName, setAnimationName] = useState(noAnimationString)
-    const [isAuto, setIsAuto] = useState<boolean>(auto)
+    const [isAuto, setIsAuto] = useState<boolean>(!!auto)
     const [timerId, setTimerId] = useState<ReturnType<typeof setTimeout>>()
 
     const animationRef = useRef<HTMLDivElement>(null)
 
-    const { nextSlide, slide, preparedSlides, setSlide, setNextSlide } = useSlides(slides)
+    const { preparedSlides, leftSlide, mainSlide, rightSlide, setLeftSlide, setMainSlide, setRightSlide } =
+        useSlides(slides)
 
-    const handleLeftMove = (slide: SlideType, nextSlide: number) => {
-        setNextSlide(slide)
-        setAnimationName(leftDirectionAnimationName)
-        setSlide(preparedSlides[nextSlide])
-
-        if (!animationRef.current) return
-        animationRef.current.addEventListener(
-            'animationend',
-            () => {
-                if (nextSlide === preparedSlides.length - 1) {
-                    setNextSlide(preparedSlides[0])
-                } else {
-                    setNextSlide(preparedSlides[nextSlide + 1])
-                }
-                setAnimationName(noAnimationString)
-                setIndex(nextSlide)
-            },
-            { once: true }
-        )
+    const leftArrowHandler = () => {
+        let curSlideIndex = preparedSlides.findIndex((item) => item.id === mainSlide.id)
+        if (curSlideIndex < 0) return
+        if (!infinitely && curSlideIndex === 0) return
+        if (curSlideIndex === 0) curSlideIndex = preparedSlides.length
+        handleLeftMove(curSlideIndex - 1)
     }
 
-    const handleRightMove = (nextSlide: number) => {
-        setNextSlide(preparedSlides[nextSlide])
-        setAnimationName(rightDirectionAnimationName)
+    const handleLeftMove = (leftSlideIndex: number) => {
+        setLeftSlide(preparedSlides[leftSlideIndex])
+        setAnimationName(leftDirectionAnimationName)
 
         if (!animationRef.current) return
+
         animationRef.current.addEventListener(
             'animationend',
             () => {
-                setSlide(preparedSlides[nextSlide])
-                if (nextSlide < preparedSlides.length - 1) {
-                    setNextSlide(preparedSlides[nextSlide + 1])
-                } else {
-                    setNextSlide(preparedSlides[0])
-                }
-                setIndex(nextSlide)
                 setAnimationName(noAnimationString)
+                setIndex(leftSlideIndex)
+                setMainSlide(preparedSlides[leftSlideIndex])
+                setLeftSlide(undefined)
             },
             { once: true }
         )
@@ -80,80 +66,73 @@ export default function useSliderLogic({ slides, auto, delay, loop, stopOnMouseO
         }
     }
 
-    const rightArrowHandler = () => {
-        let curSlideIndex = preparedSlides.findIndex((item) => item.id === slide.id)
-        if (curSlideIndex === preparedSlides.length - 1) {
-            curSlideIndex = -1
-        }
-
-        if (!loop && curSlideIndex === -1) {
-            return
-        }
-
-        if (curSlideIndex === preparedSlides.length - 2) {
-            setNextSlide(preparedSlides[0])
-        } else {
-            setNextSlide(preparedSlides[curSlideIndex + 2])
-        }
-        setSlide(preparedSlides[curSlideIndex + 1])
-
+    const handleRightMove = (rightSlideIndex: number) => {
+        setRightSlide(preparedSlides[rightSlideIndex])
         setAnimationName(rightDirectionAnimationName)
 
         if (!animationRef.current) return
+
         animationRef.current.addEventListener(
             'animationend',
             () => {
-                setSlide(preparedSlides[curSlideIndex + 1])
-                setIndex(nextSlide.index)
                 setAnimationName(noAnimationString)
+                setIndex(rightSlideIndex)
+                setMainSlide(preparedSlides[rightSlideIndex])
+                setRightSlide(undefined)
             },
             { once: true }
         )
     }
+    const rightArrowHandler = () => {
+        let curSlideIndex = preparedSlides.findIndex((item) => item.id === mainSlide.id)
+        if (curSlideIndex < 0) return
+        if (curSlideIndex === preparedSlides.length - 1) {
+            curSlideIndex = -1
+        }
+        if (!infinitely && curSlideIndex < 0) return
 
-    const leftArrowHandler = () => {
-        let curSlideIndex = preparedSlides.findIndex((item) => item.id === slide.id)
-        if (!loop && !curSlideIndex) {
+        if (curSlideIndex < 0) {
+            handleRightMove(0)
             return
         }
-        if (loop && !curSlideIndex) {
-            curSlideIndex = preparedSlides.length
-        }
+        handleRightMove(curSlideIndex + 1)
+    }
 
-        handleLeftMove(slide, curSlideIndex - 1)
+    const handlePaginationBtn = (newIndex: number): void => {
+        if (newIndex === index) {
+            return
+        }
+        if (newIndex < index) {
+            handleLeftMove(newIndex)
+        } else {
+            handleRightMove(newIndex)
+        }
     }
 
     useEffect(() => {
-        if (!isAuto) return
+        if (!auto || !isAuto) return
         setTimerId(() =>
             setTimeout(() => {
-                rightArrowHandler()
-            }, delay)
+                if (!auto.direction || auto.direction === DirectionType.RIGHT) {
+                    rightArrowHandler()
+                    return
+                }
+                leftArrowHandler()
+            }, auto.delay || defaultDelay)
         )
-    }, [isAuto, delay, slide])
+    }, [isAuto, auto, mainSlide])
 
     return {
-        slide,
-        nextSlide,
+        leftSlide,
+        mainSlide,
+        rightSlide,
         animationRef,
         index,
         animationName,
         leftArrowHandler,
         rightArrowHandler,
+        handlePaginationBtn,
         handleMouseEnter,
         handleMouseLeave,
     }
 }
-
-// const handlePaginationBtn = (newIndex: number): void => {
-//     if (newIndex === index) {
-//         return
-//     }
-//     const curSlideIndex: number = preparedSlides.findIndex((item) => item.index === index)
-//
-//     if (newIndex < index) {
-//         handleLeftMove(slide, curSlideIndex)
-//     } else {
-//         handleRightMove(curSlideIndex)
-//     }
-// }
