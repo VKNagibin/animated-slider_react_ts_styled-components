@@ -23,13 +23,13 @@ export enum DirectionType {
 }
 
 export type SlideType = {
-    img: string
-    text: string
+    src: string
+    description: string
     id: string
     index: number
 }
 
 export type InitialSlideType = {
-    img: string
-    text: string
+    src: string
+    description: string
 }

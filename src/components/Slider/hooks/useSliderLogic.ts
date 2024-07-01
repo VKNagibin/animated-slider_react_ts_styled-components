@@ -17,16 +17,40 @@ const leftDirectionAnimationName = 'leftDirection'
 const rightDirectionAnimationName = 'rightDirection'
 const noAnimationString = ''
 
-export default function useSliderLogic({ slides, auto, infinitely, stopOnMouseOver }: HookInterface) {
+export default function useSliderLogic({
+    slides,
+    auto,
+    infinitely,
+    stopOnMouseOver,
+}: HookInterface) {
     const [index, setIndex] = useState<number>(0)
     const [animationName, setAnimationName] = useState(noAnimationString)
     const [isAuto, setIsAuto] = useState<boolean>(!!auto)
     const [timerId, setTimerId] = useState<ReturnType<typeof setTimeout>>()
+    const [preloaded, setPreloaded] = useState<boolean>(false)
 
     const animationRef = useRef<HTMLDivElement>(null)
 
     const { preparedSlides, leftSlide, mainSlide, rightSlide, setLeftSlide, setMainSlide, setRightSlide } =
         useSlides(slides)
+
+    const preloadImage = (src: string) => {
+        return new Promise((resolve) => {
+            const image = new Image()
+            image.src = src
+            image.onload = () => {
+                image.decode().then(() => resolve(null))
+            }
+        })
+    }
+
+    const preloadImages = async () => {
+        const imagePromises = slides.map((slide) => {
+            return preloadImage(slide.src)
+        })
+        await Promise.all(imagePromises)
+        setPreloaded(true)
+    }
 
     const leftArrowHandler = () => {
         let curSlideIndex = preparedSlides.findIndex((item) => item.id === mainSlide.id)

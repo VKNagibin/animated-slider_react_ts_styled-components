@@ -17,14 +17,7 @@ const AppComponent = styled.div`
 function App() {
     return (
         <AppComponent>
-            <Slider
-                slides={mockSlides}
-                withPagination
-                withNavigation
-                infinitely
-                // auto={{ active: true, direction: DirectionType.RIGHT }}
-                stopOnMouseOver
-            />
+            <Slider slides={mockSlides} withPagination withNavigation infinitely stopOnMouseOver />
         </AppComponent>
     )
 }

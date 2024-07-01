@@ -2,6 +2,7 @@ import { nanoid } from 'nanoid'
 import React, { memo } from 'react'
 
 import { SliderInterface } from '@/types'
+
 import ControlButton from '../ControlButton'
 import PaginationButton from '../PaginationButton'
 import {
@@ -38,22 +39,23 @@ function Slider({
     } = useSliderLogic({ slides, auto, infinitely, stopOnMouseOver })
 
     return (
-        <StyledComponentContainer>
-            <StyledSliderContainer onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
-                {withNavigation && (
-                    <>
-                        <ControlButton side="left" onClick={leftArrowHandler} />
-                        <ControlButton side="right" onClick={rightArrowHandler} />
-                    </>
-                )}
-                <StyledSlidesCount>{`${index + 1} / ${slides.length}`}</StyledSlidesCount>
-                <StyledSlidesContainer ref={animationRef} className={animationName}>
-                    {leftSlide && <StyledImage src={leftSlide.img} title="left" />}
-                    <StyledImage src={mainSlide.img} title="main" />
-                    {rightSlide && <StyledImage src={rightSlide.img} title="right" />}
-                </StyledSlidesContainer>
-                <StyledDescription>{slides[index].text}</StyledDescription>
-            </StyledSliderContainer>
+        <StyledComponentContainer style={{ position: 'relative' }}>
+
+                <StyledSliderContainer onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+                    {withNavigation && (
+                        <>
+                            <ControlButton side="left" onClick={leftArrowHandler} />
+                            <ControlButton side="right" onClick={rightArrowHandler} />
+                        </>
+                    )}
+                    <StyledSlidesCount>{`${index + 1} / ${slides.length}`}</StyledSlidesCount>
+                    <StyledSlidesContainer ref={animationRef} className={animationName}>
+                        {leftSlide && <StyledImage src={leftSlide.src} title="left" />}
+                        <StyledImage src={mainSlide.src} title="main" />
+                        {rightSlide && <StyledImage src={rightSlide.src} title="right" />}
+                    </StyledSlidesContainer>
+                    <StyledDescription>{slides[index].description}</StyledDescription>
+                </StyledSliderContainer>
             {withPagination && (
                 <StyledPaginationContainer onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
                     {slides.map(
